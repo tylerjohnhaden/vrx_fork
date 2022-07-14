@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.6">
+  <model name="netmodel">
+    <pose>0 0 -40 0 0 0</pose>
+    <static>true</static>
+    
+    <link name="netlink">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>/home/team3/catkin_ws/src/vrx/vrx_gazebo/models/net/meshes/net2.dae</uri>
+          </mesh>
+        </geometry>
+        
+        <!-- <geometry>
+          <cylinder>
+            <radius>25</radius>
+            <length>45</length>
+          </cylinder>
+        </geometry> -->
+      </visual>
+      
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>/home/team3/catkin_ws/src/vrx/vrx_gazebo/models/net/meshes/net2.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>
+

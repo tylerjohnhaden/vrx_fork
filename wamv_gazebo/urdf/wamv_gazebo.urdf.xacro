@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!-- Basic WAM-V with gazebo plugins for dynamics -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+       name="WAM-V">
+  <xacro:arg name="locked" default="false" />
+  <xacro:arg name="thruster_config" default="H" />
+  <xacro:arg name="camera_enabled" default="false" />
+  <xacro:arg name="gps_enabled" default="false" />
+  <xacro:arg name="imu_enabled" default="false" />
+  <xacro:arg name="lidar_enabled" default="false" />
+  <xacro:arg name="ground_truth_enabled" default="false" />
+  <xacro:arg name="vrx_sensors_enabled" default="false" />
+  <xacro:arg name="pinger_enabled" default="false" />
+  <xacro:arg name="ball_shooter_enabled" default="false" />
+  <xacro:arg name="thruster_namespace" default="thrusters/"/>
+  <xacro:arg name="camera_namespace" default="cameras/"/>  
+  <xacro:arg name="sensor_namespace" default="sensors/"/>
+  <xacro:arg name="pinger_namespace" default="pingers/"/>
+  <xacro:arg name="shooter_namespace" default="shooters/"/>
+  <!-- Note: this is only used for some sensors that do not correctly use the 
+  robotNamespace parameter -->
+  <xacro:arg name="namespace" default="wamv"/>    
+  <xacro:property name="thruster_namespace" value="$(arg thruster_namespace)" scope="global" />
+  <xacro:property name="camera_namespace" value="$(arg camera_namespace)" scope="global" />
+  <xacro:property name="sensor_namespace" value="$(arg sensor_namespace)" scope="global" />
+  <xacro:property name="pinger_namespace" value="$(arg pinger_namespace)" scope="global" />
+  <xacro:property name="shooter_namespace" value="$(arg shooter_namespace)" scope="global" />
+  <xacro:property name="namespace" value="$(arg namespace)" scope="global" />      
+  
+  <!-- Sensor yaml file -->
+  <xacro:arg name="yaml_component_generation" default="false"/>
+  <xacro:arg name="component_xacro_file" default = ""/>
+
+  <!-- Thruster yaml file -->
+  <xacro:arg name="yaml_thruster_generation" default="false"/>
+  <xacro:arg name="thruster_xacro_file" default = ""/>
+
+  <!-- === The WAM-V platform === -->
+  <xacro:include filename="$(find wamv_gazebo)/urdf/wamv_gazebo.xacro"/>
+  
+  <xacro:wamv_gazebo thruster_layout="$(find wamv_gazebo)/urdf/thruster_layouts/wamv_aft_thrusters.xacro"/>
+
+  <!-- === Decide if we lock the robot to the world === -->
+  <xacro:if value="$(arg locked)">
+    <gazebo>
+      <link name="wamv_external_link"/>
+      <joint name="wamv_external_pivot_joint" type="universal">
+        <parent>wamv::wamv/base_link</parent>
+        <child>wamv_external_link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+        <axis2>
+          <xyz>0 1 0</xyz>
+        </axis2>
+      </joint>
+      <joint name="wamv_external_riser" type="prismatic">
+        <parent>world</parent>
+        <child>wamv_external_link</child>
+        <axis>
+          <limit>
+            <lower>-3</lower>
+            <upper>3</upper>
+          </limit>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+    </gazebo>
+  </xacro:if>
+
+  <xacro:arg name="wec_platform_height" default="0.41"/>
+
+  <!-- <xacro:lidar name="starbord_lidar" type="16_beam" x="-0.1" y="0.75" z="$(arg wec_platform_height)" /> -->
+  <!-- <xacro:lidar name="port_lidar" type="16_beam" x="-0.1" y="-0.75" z="$(arg wec_platform_height)" /> -->
+  <xacro:wamv_camera name="fore_camera" x="1" z="$(arg wec_platform_height)" P="${radians(15)}" />
+  <xacro:wamv_camera name="aft_camera" x="-0.55" z="$(arg wec_platform_height)" P="${radians(15)}" Y="${radians(180)}" post_Y="${radians(180)}" />
+  <xacro:wamv_camera name="starbord_camera" y="0.65" z="$(arg wec_platform_height)" Y="${radians(90)}" post_Y="${radians(90)}" />
+  <xacro:wamv_camera name="port_camera" y="-0.65" z="$(arg wec_platform_height)" Y="${radians(-90)}" post_Y="${radians(-90)}" />
+  <xacro:wamv_gps name="gps" z="2.05" />
+  <xacro:wamv_imu name="imu" x="0.1" y="0.6" z="$(arg wec_platform_height)" />
+
+</robot>
